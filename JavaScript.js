@@ -5,12 +5,12 @@ let x = 0;
 
 document.addEventListener("keydown", (e)=>{
     console.log(e.code);
-    if(e.code === "ArrowLeft"){
+    if(e.code === "KeyA"){
         x=x-100;
         $Jugador1.style.left = x + "px";    
     }
 
-    if(e.code === "ArrowRight"){
+    if(e.code === "KeyD"){
         x=x+100;
         $Jugador1.style.left = x + "px";    
     }
