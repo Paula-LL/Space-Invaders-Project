@@ -1,17 +1,17 @@
-.col{
-    border: 1px solid black;
-    min-height: 500px;
+.col {
+    border: 1px solid rgb(0, 0, 0);
 
-    
+
 }
 
-.Jugador1{
+.Jugador1 {
     position: absolute;
     display: block;
     transition: all .2s ease-in-out;
 }
 
-.Jugador2{
+
+.Jugador2 {
     position: absolute;
     display: block;
     transition: all .2s ease-in-out;
