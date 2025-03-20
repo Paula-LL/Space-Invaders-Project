@@ -4,3 +4,9 @@
 
     
 }
+
+.Jugador1{
+    position: absolute;
+    display: block;
+    transition: all .2s ease-in-out;
+}
