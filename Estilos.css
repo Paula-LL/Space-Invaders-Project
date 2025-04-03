@@ -1,8 +1,7 @@
-
-.col{
+.col {
     border: 1px solid rgb(0, 0, 0);
 
-  
+
 }
 
 canvas {
@@ -22,7 +21,8 @@ canvas {
     transition: all .2s ease-in-out;
 }
 
-.Jugador2{
+
+.Jugador2 {
     position: absolute;
     display: block;
     transition: all .2s ease-in-out;

@@ -14,3 +14,9 @@ document.addEventListener("keydown", (e) => {
         $Jugador2.style.right = (-x) + "px";
     }
 });
+
+/*document.getElementById("demo").onkeydown = function() {myFunction()};
+
+function myFunction() {
+  document.getElementById("demo").style.backgroundColor = "red";
+}*/
