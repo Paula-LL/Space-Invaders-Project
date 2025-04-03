@@ -15,6 +15,10 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
+let livesPlayer2 = 5; 
+
+Console.log(livesPlayer2);
+
 /*document.getElementById("demo").onkeydown = function() {myFunction()};
 
 function myFunction() {

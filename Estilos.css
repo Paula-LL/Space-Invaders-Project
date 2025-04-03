@@ -4,9 +4,6 @@
 
 }
 
-<<<<<<< HEAD
-.Jugador1 {
-=======
 canvas {
     border:1px solid #d3d3d3;
     background-color: #f1f1f1;
@@ -19,7 +16,6 @@ canvas {
 }
 
 .Jugador1{
->>>>>>> Jugador1
     position: absolute;
     display: block;
     transition: all .2s ease-in-out;
