@@ -1,5 +1,6 @@
 let dom = $(document);
-const $Jugador2 = document.getElementById("Jugador2");
+//const Lives= document.getElementById("livesplayer2");
+/*const $Jugador2 = document.getElementById("Jugador2");
 let x = 0;
 
 document.addEventListener("keydown", (e) => {
@@ -13,11 +14,28 @@ document.addEventListener("keydown", (e) => {
         x = x + 100;
         $Jugador2.style.right = (-x) + "px";
     }
-});
+});*/
 
 let livesPlayer2 = 5; 
 
-Console.log(livesPlayer2);
+console.log(livesPlayer2);
+
+/*psuedo code ideas:
+For player win conditions and messages
+    if (player1Lives = 0){
+        player2 = win message 
+    } else if (player2Lives = 0){
+        player1 = win message
+    }
+
+Disparos enemigos:
+    SImilar code to player shooting 
+
+Make lives appear besides a miniature of the spaceships and decrease whne hit by enemy projectiles.
+
+*/
+
+
 
 /*document.getElementById("demo").onkeydown = function() {myFunction()};
 
