@@ -1,6 +1,5 @@
 let dom = $(document);
-const $Jugador1 = document.getElementById("Jugador1");
-const $Jugador2 = document.getElementById("Jugador2");
+
 
 let x = 0;
 var myGamePiece;
@@ -114,34 +113,3 @@ function shoot() {
 }
 
 
-
-
-
-
-/*Jugador 1
-document.addEventListener("keydown", (e)=>{
-    console.log(e.code);
-    if(e.code === "KeyA"){
-        x=x-50;
-        $Jugador1.style.left = x + "px";    
-    }
-
-    if(e.code === "KeyD"){
-        x=x+50;
-        $Jugador1.style.left = x + "px";    
-    }
-
-});*/
-/*Jugador 2
-document.addEventListener("keydown", (e) => {
-    console.log(e.code);
-    if (e.code === "ArrowRight") {
-        x = x - 50;
-        $Jugador2.style.right  = x + "px";
-    }
-
-    if (e.code === "ArrowLeft") {
-        x = x + 50;
-        $Jugador2.style.right = x + "px";
-    }
-});*/
