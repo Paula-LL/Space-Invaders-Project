@@ -126,6 +126,7 @@ function updateGameArea() {
         bullets[i].update();
     }
     
+    grupoEnemigos.actualizar();
 }
 
 // Función para disparar, con control de tiempo entre disparos
@@ -151,3 +152,73 @@ function shoot() {
     }
 }
 
+class Enemigos {
+    constructor() {
+        this.lastMoveTime = 0; // Último momento en que los enemigos se movieron
+        this.moveInterval = 600; // Tiempo entre movimientos en milisegundos
+        this.enemigos = []; // Array para almacenar todos los enemigos
+        this.direccion = 1; // 1 = derecha, -1 = izquierda
+        this.velocidadX = 15; // Velocidad horizontal
+        this.velocidadY = 0; // Velocidad vertical (solo cuando tocan el borde)
+        this.margen = 50; // Margen desde los bordes del canvas
+        this.spacingX = 70; // Espacio horizontal entre enemigos
+        this.spacingY = 60; // Espacio vertical entre enemigos
+        this.inicializarEnemigos();
+    }
+
+    inicializarEnemigos() {
+        const filas = 5;
+        const columnas = 11;
+        const imgPaths = [
+            "Imagenes/Enemy_1SpaceInvaders.png",
+        ];
+
+        for (let fila = 0; fila < filas; fila++) {
+            for (let col = 0; col < columnas; col++) {
+                const x = this.margen + col * this.spacingX;
+                const y = this.margen + fila * this.spacingY;
+                const imgIndex = Math.min(fila, imgPaths.length - 1);
+                const enemigo = new component(50, 50, imgPaths[imgIndex], x, y);
+                this.enemigos.push(enemigo);
+            }
+        }
+    }
+
+    actualizar() {
+        const currentTime = new Date().getTime();
+        let cambioDireccion = false;
+    
+        // Solo mover si pasó el tiempo suficiente
+        if (currentTime - this.lastMoveTime >= this.moveInterval) {
+            this.lastMoveTime = currentTime;
+    
+            // Verificar si algún enemigo toca bordes
+            for (const enemigo of this.enemigos) {
+                if ((enemigo.x + enemigo.width >= myGameArea.canvas.width - this.margen && this.direccion > 0) || 
+                    (enemigo.x <= this.margen && this.direccion < 0)) {
+                    cambioDireccion = true;
+                    break;
+                }
+            }
+    
+            // Cambiar dirección si hace falta
+            if (cambioDireccion) {
+                this.direccion *= -1;
+                this.velocidadY = 20;
+            } else {
+                this.velocidadY = 0;
+            }
+    
+            // Mover enemigos
+            for (const enemigo of this.enemigos) {
+                enemigo.x += this.velocidadX * this.direccion;
+                enemigo.y += this.velocidadY;
+            }
+        }
+    
+        // Actualizar (dibujar) en cada frame, aunque no se muevan
+        for (const enemigo of this.enemigos) {
+            enemigo.update();
+        }
+    }
+}
