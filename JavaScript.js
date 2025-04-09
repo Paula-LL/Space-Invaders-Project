@@ -49,12 +49,11 @@ function component(width, height, imageSrc, x, y) {
     this.speedY = 0;
     this.x = x;
     this.y = y;
-    this.image = new Image();  // Crear un nuevo objeto de imagen
-    this.image.src = imageSrc;  // Asignar la ruta de la imagen
+    this.image = new Image();  // Es crea un objecte de tipus imatge
+    this.image.src = imageSrc;  // Per asignar la ruta de la imatge (on esta)
 
     this.update = function () {
         ctx = myGameArea.context;
-        // Dibujar la imagen en lugar de un rectángulo
         ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
 
@@ -83,53 +82,77 @@ function bulletComponent(width, height, color, x, y) {
     this.newPos = function () {
         this.y += this.speedY;  // Movimiento hacia arriba o hacia abajo
     }
+
+    // Verifica si la bala a tocar algun enemic
+    this.colisionaCon = function (enemigo) {
+        return (this.x < enemigo.x + enemigo.width &&
+                this.x + this.width > enemigo.x &&
+                this.y < enemigo.y + enemigo.height &&
+                this.y + this.height > enemigo.y);
+    }
 }
 //Aquesta funcio actualitza l'area de joc:
 function updateGameArea() {
     myGameArea.clear();
 
+    // Actualitzem la velocitat dels jugadors
     myGamePiece.speedX = 0;
     myGamePiece2.speedX = 0;
 
     // Movimiento de los jugadores
-    if (myGameArea.keys && myGameArea.keys[37]) {
+    if (myGameArea.keys && myGameArea.keys[37]) { // Moviment cap a la esquerra del jugador 1
         myGamePiece.speedX = -2;
     }
-    if (myGameArea.keys && myGameArea.keys[39]) {
+    if (myGameArea.keys && myGameArea.keys[39]) { // Moviment cap a la dreta del jugador 1
         myGamePiece.speedX = 2;
     }
 
-    if (myGameArea.keys && myGameArea.keys[65]) {
+    if (myGameArea.keys && myGameArea.keys[65]) { //  Moviment cap a la esquerra del jugador 2
         myGamePiece2.speedX = -2;
     }
-    if (myGameArea.keys && myGameArea.keys[68]) {
+    if (myGameArea.keys && myGameArea.keys[68]) { // Moviment cap a la dreta del jugador 2
         myGamePiece2.speedX = 2;
     }
 
-    //Actualitza la posició dels jugadors
+    // Actualitza la posicio dels jugadors i els dibuixa
     myGamePiece.newPos();
     myGamePiece.update();
 
     myGamePiece2.newPos();
     myGamePiece2.update();
 
-    // Crida a la funcio disparar perque els jugadors puguin disparar
+    // Crida a la funcio disparar
     shoot();
 
-    // Les bales dels jugadors s'actualitzen en l'arrayList creat per emmagatzemar-les dins d'aquest.
+    // Actualiza las balas dels jugadors
     for (let i = 0; i < bullets.length; i++) {
         bullets[i].newPos();
         bullets[i].update();
     }
 
+    // Actualitzem els enemics
     grupoEnemigos.actualizar();
 
-    // Les bales dels enemics s'actualitzen en l'arrayList creat per emmagatzemar-les dins d'aquest.
+    // S'actualizen les bales dels enemics
     for (let i = 0; i < enemyBullets.length; i++) {
         enemyBullets[i].newPos();
         enemyBullets[i].update();
     }
+
+    // Es verifica si les bales i els enemics han sigut colisionats
+    for (let i = 0; i < bullets.length; i++) {
+        for (let j = 0; j < grupoEnemigos.enemigos.length; j++) {
+            if (bullets[i].colisionaCon(grupoEnemigos.enemigos[j])) {
+                // Elimina la bala i el enemic que han colisionat
+                bullets.splice(i, 1); // la funcio splice elimina
+                grupoEnemigos.enemigos.splice(j, 1);
+                i--; // Decrementa el índice de las balas para no saltarse ninguna
+                break; // Surtir del bucle perque nomes una bala pot eliminar a un enemic
+            }
+        }
+    }
 }
+
 
 // Funcio de disparar dels jugadors
 function shoot() {
@@ -166,7 +189,7 @@ class Enemigos {
         this.espacioX = 70; // L'espai que hi ha entre enemic i enemic horitzontalment
         this.espacioY = 60; // Espai que hi ha entre enmic i enemic verticalment
         this.lastShotTime = 0; // Quan va ser la ultima vegada q va disparar un enemic
-        this.inicializarEnemigos();
+        this.inicializarEnemigos(); //Inicialitzem els enemics perque es mostrin
     }
 
     inicializarEnemigos() {
@@ -178,6 +201,8 @@ class Enemigos {
             "Imagenes/Enemigo3.png",
             "Imagenes/Enemigo4.png"
         ];
+
+        //Aqui creem el grid per introduir les imatges dels aliens
 
         for (let fila = 0; fila < filas; fila++) {
             for (let col = 0; col < columnas; col++) {
@@ -198,7 +223,7 @@ class Enemigos {
         if (currentTime - this.lastMoveTime >= this.moveInterval) {
             this.lastMoveTime = currentTime;
 
-            // Verificar si algún enemigo toca bordes
+            // Es verifica si els enemics han tocat el marge del canva
             for (const enemigo of this.enemigos) {
                 if ((enemigo.x + enemigo.width >= myGameArea.canvas.width - this.margen && this.direccion > 0) || 
                     (enemigo.x <= this.margen && this.direccion < 0)) {
@@ -207,7 +232,7 @@ class Enemigos {
                 }
             }
 
-            // Cambiar dirección si hace falta
+            // Si cal, cambiara de direcció tan verticalment com horitzontalment
             if (cambioDireccion) {
                 this.direccion *= -1;
                 this.velocidadY = 20;
@@ -215,23 +240,25 @@ class Enemigos {
                 this.velocidadY = 0;
             }
 
-            // Mover enemigos
+            // Com es mouran els enemics
             for (const enemigo of this.enemigos) {
                 enemigo.x += this.velocidadX * this.direccion;
                 enemigo.y += this.velocidadY;
             }
         }
 
-        // Actualizar (dibujar) en cada frame, aunque no se muevan
+        // Aqui actualitzem els enemics (dibuixar-los al canvas)
         for (const enemigo of this.enemigos) {
             enemigo.update();
         }
 
-        // Cada cierto tiempo disparan
+        // Cada cert temps dispararan
         if (currentTime - this.lastShotTime > 1000) { // cada 1 segundo
             this.disparar();
             this.lastShotTime = currentTime;
         }
+
+        
     }
 
     disparar() {
