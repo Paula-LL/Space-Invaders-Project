@@ -11,8 +11,8 @@ var lastShotTimePlayer1 = 0;  // Tiempo del último disparo para el jugador 1
 var lastShotTimePlayer2 = 0;  // Tiempo del último disparo para el jugador 2
 var shootCooldown = 500;  // Tiempo de espera entre disparos en milisegundos
 
-var vidasJugador1 = 5;
-var vidasJugador2 = 5;
+var vidaJugador1 = 5;
+var vidaJugador2 = 5;
 
 function startGame() {
     myGameArea.start();
