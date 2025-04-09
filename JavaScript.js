@@ -11,10 +11,14 @@ var lastShotTimePlayer1 = 0;  // Tiempo del último disparo para el jugador 1
 var lastShotTimePlayer2 = 0;  // Tiempo del último disparo para el jugador 2
 var shootCooldown = 500;  // Tiempo de espera entre disparos en milisegundos
 
+var vidasJugador1 = 5;
+var vidasJugador2 = 5;
+
 function startGame() {
     myGameArea.start();
     myGamePiece = new component(100, 110, "Imagenes/Nave1.png", 695, 790);  // Jugador 1
     myGamePiece2 = new component(100, 110, "Imagenes/Player2.png", 580, 800); // Jugador 2
+    grupoEnemigos = new Enemigos();
 }
 
 var myGameArea = {
@@ -90,17 +94,17 @@ function updateGameArea() {
     myGamePiece2.speedX = 0;
 
     // Movimiento de los jugadores
-    if (myGameArea.keys && myGameArea.keys[65]) {
+    if (myGameArea.keys && myGameArea.keys[37]) {
         myGamePiece.speedX = -2;
     }
-    if (myGameArea.keys && myGameArea.keys[68]) {
+    if (myGameArea.keys && myGameArea.keys[39]) {
         myGamePiece.speedX = 2;
     }
 
-    if (myGameArea.keys && myGameArea.keys[37]) {
+    if (myGameArea.keys && myGameArea.keys[65]) {
         myGamePiece2.speedX = -2;
     }
-    if (myGameArea.keys && myGameArea.keys[39]) {
+    if (myGameArea.keys && myGameArea.keys[68]) {
         myGamePiece2.speedX = 2;
     }
 
@@ -111,6 +115,8 @@ function updateGameArea() {
     myGamePiece2.newPos();
     myGamePiece2.update();
 
+    
+
     // Llamar a la función para disparar las balas
     shoot();
 
@@ -119,13 +125,14 @@ function updateGameArea() {
         bullets[i].newPos();
         bullets[i].update();
     }
+    
 }
 
 // Función para disparar, con control de tiempo entre disparos
 function shoot() {
     let currentTime = new Date().getTime(); // Obtener el tiempo actual
 
-    if (myGameArea.keys && myGameArea.keys[32]) {  // Espacio para disparar el jugador 1
+    if (myGameArea.keys && myGameArea.keys[96]) {  // Espacio para disparar el jugador 1
         if (currentTime - lastShotTimePlayer1 >= shootCooldown) {
             let bullet1 = new bulletComponent(5, 10, "red", myGamePiece.x + 2 + myGamePiece.width / 2 - 5, myGamePiece.y + 20);
             bullet1.speedY = -5;  // Movimiento hacia arriba
@@ -134,7 +141,7 @@ function shoot() {
         }
     }
 
-    if (myGameArea.keys && myGameArea.keys[96]) {  // 0 del pad numérico para disparar el jugador 2
+    if (myGameArea.keys && myGameArea.keys[32]) {  // 0 del pad numérico para disparar el jugador 2
         if (currentTime - lastShotTimePlayer2 >= shootCooldown) {
             let bullet2 = new bulletComponent(5, 10, "blue", myGamePiece2.x + 2 + myGamePiece2.width / 2 - 5, myGamePiece2.y + 10);
             bullet2.speedY = -5;  // Movimiento hacia arriba
@@ -143,3 +150,4 @@ function shoot() {
         }
     }
 }
+
