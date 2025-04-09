@@ -1,3 +1,7 @@
+body{
+    background-image: url(Imagenes/FondoEspacio.jpg);
+}
+
 .col {
     border: 1px solid rgb(0, 0, 0);
 
@@ -15,15 +19,3 @@ canvas {
 
 }
 
-.Jugador1{
-    position: absolute;
-    display: block;
-    transition: all .2s ease-in-out;
-}
-
-
-.Jugador2 {
-    position: absolute;
-    display: block;
-    transition: all .2s ease-in-out;
-}
