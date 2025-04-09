@@ -3,13 +3,12 @@ let dom = $(document);
 let x = 0;
 var myGamePiece;
 var myGamePiece2;
-var bullet1;
-var bullet2;
-var bullets = [];  // Array para manejar las balas
+var bullets = [];         // ArrayList on guardar les bales dels jugadors
+var enemyBullets = [];    // ArrayList on guardar les bales dels enemics
 
-var lastShotTimePlayer1 = 0;  // Tiempo del último disparo para el jugador 1
-var lastShotTimePlayer2 = 0;  // Tiempo del último disparo para el jugador 2
-var shootCooldown = 500;  // Tiempo de espera entre disparos en milisegundos
+var lastShotTimePlayer1 = 0;  // Temps de l'ultim dispar del jugador 1
+var lastShotTimePlayer2 = 0;  // Temps de l'ultim dispar del jugador 2
+var shootCooldown = 500;      // Temps que posem entre dispar i dispar dels jugadors, perque no disparin seguit
 
 var vidaJugador1 = 5;
 var vidaJugador2 = 5;
@@ -18,7 +17,7 @@ function startGame() {
     myGameArea.start();
     myGamePiece = new component(100, 110, "Imagenes/Nave1.png", 695, 790);  // Jugador 1
     myGamePiece2 = new component(100, 110, "Imagenes/Player2.png", 580, 800); // Jugador 2
-    grupoEnemigos = new Enemigos();
+    grupoEnemigos = new Enemigos(); //Es crea el grup dels enemics cridant a la classe Enemigos
 }
 
 var myGameArea = {
@@ -32,10 +31,10 @@ var myGameArea = {
         window.addEventListener('keydown', function (e) {
             myGameArea.keys = (myGameArea.keys || []);
             myGameArea.keys[e.keyCode] = (e.type == "keydown");
-        })
+        });
         window.addEventListener('keyup', function (e) {
             myGameArea.keys[e.keyCode] = (e.type == "keydown");
-        })
+        });
     },
     clear: function () {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -85,8 +84,7 @@ function bulletComponent(width, height, color, x, y) {
         this.y += this.speedY;  // Movimiento hacia arriba o hacia abajo
     }
 }
-
-// Esta función actualiza el área de juego, incluyendo el movimiento de los jugadores y las balas
+//Aquesta funcio actualitza l'area de joc:
 function updateGameArea() {
     myGameArea.clear();
 
@@ -108,61 +106,66 @@ function updateGameArea() {
         myGamePiece2.speedX = 2;
     }
 
-    // Actualizar las posiciones de los jugadores
+    //Actualitza la posició dels jugadors
     myGamePiece.newPos();
     myGamePiece.update();
 
     myGamePiece2.newPos();
     myGamePiece2.update();
 
-    
-
-    // Llamar a la función para disparar las balas
+    // Crida a la funcio disparar perque els jugadors puguin disparar
     shoot();
 
-    // Actualizar las balas
+    // Les bales dels jugadors s'actualitzen en l'arrayList creat per emmagatzemar-les dins d'aquest.
     for (let i = 0; i < bullets.length; i++) {
         bullets[i].newPos();
         bullets[i].update();
     }
-    
+
     grupoEnemigos.actualizar();
+
+    // Les bales dels enemics s'actualitzen en l'arrayList creat per emmagatzemar-les dins d'aquest.
+    for (let i = 0; i < enemyBullets.length; i++) {
+        enemyBullets[i].newPos();
+        enemyBullets[i].update();
+    }
 }
 
-// Función para disparar, con control de tiempo entre disparos
+// Funcio de disparar dels jugadors
 function shoot() {
-    let currentTime = new Date().getTime(); // Obtener el tiempo actual
+    let currentTime = new Date().getTime(); // Agafem el temps actual
 
-    if (myGameArea.keys && myGameArea.keys[96]) {  // Espacio para disparar el jugador 1
+    if (myGameArea.keys && myGameArea.keys[96]) {  // El jugador disparara amb el 0 del pad numeric
         if (currentTime - lastShotTimePlayer1 >= shootCooldown) {
             let bullet1 = new bulletComponent(5, 10, "red", myGamePiece.x + 2 + myGamePiece.width / 2 - 5, myGamePiece.y + 20);
-            bullet1.speedY = -5;  // Movimiento hacia arriba
-            bullets.push(bullet1); // Agregar la bala al array de balas
-            lastShotTimePlayer1 = currentTime; // Registrar el tiempo del último disparo
+            bullet1.speedY = -5;
+            bullets.push(bullet1); // Afegeix la bala dins del ArrayList creat
+            lastShotTimePlayer1 = currentTime; //Aixo es per guardar quan va ser la ultima vegada que el jugador va disparar
         }
     }
 
-    if (myGameArea.keys && myGameArea.keys[32]) {  // 0 del pad numérico para disparar el jugador 2
+    if (myGameArea.keys && myGameArea.keys[32]) {  //El jugador disparara amb la tecla espai
         if (currentTime - lastShotTimePlayer2 >= shootCooldown) {
             let bullet2 = new bulletComponent(5, 10, "blue", myGamePiece2.x + 2 + myGamePiece2.width / 2 - 5, myGamePiece2.y + 10);
-            bullet2.speedY = -5;  // Movimiento hacia arriba
-            bullets.push(bullet2); // Agregar la bala al array de balas
-            lastShotTimePlayer2 = currentTime; // Registrar el tiempo del último disparo
+            bullet2.speedY = -5; 
+            bullets.push(bullet2);
+            lastShotTimePlayer2 = currentTime; 
         }
     }
 }
 
 class Enemigos {
     constructor() {
-        this.lastMoveTime = 0; // Último momento en que los enemigos se movieron
-        this.moveInterval = 600; // Tiempo entre movimientos en milisegundos
-        this.enemigos = []; // Array para almacenar todos los enemigos
-        this.direccion = 1; // 1 = derecha, -1 = izquierda
-        this.velocidadX = 15; // Velocidad horizontal
-        this.velocidadY = 0; // Velocidad vertical (solo cuando tocan el borde)
-        this.margen = 50; // Margen desde los bordes del canvas
-        this.spacingX = 70; // Espacio horizontal entre enemigos
-        this.spacingY = 60; // Espacio vertical entre enemigos
+        this.lastMoveTime = 0; // Quan va ser l'ultim moment que es van moure els enemics
+        this.moveInterval = 600; // L'interval de temps q li donem als enemics perque es moguin
+        this.enemigos = []; // Guardem aqui els enemics
+        this.direccion = 1; //La direcció on aniran: -1 cap a la esquerra, 1 cap a la dreta. Posem com a default cap a la dreta
+        this.velocidadX = 15; // La velocitat horitzontal
+        this.velocidadY = 0; // Quan toquen el borde del canva
+        this.margen = 50; // El marge que donem al canvas perque quan aquest sigui tocat pels aliens, aquests baixin
+        this.espacioX = 70; // L'espai que hi ha entre enemic i enemic horitzontalment
+        this.espacioY = 60; // Espai que hi ha entre enmic i enemic verticalment
+        this.lastShotTime = 0; // Quan va ser la ultima vegada q va disparar un enemic
         this.inicializarEnemigos();
     }
 
@@ -170,13 +173,16 @@ class Enemigos {
         const filas = 5;
         const columnas = 11;
         const imgPaths = [
-            "Imagenes/Enemy_1SpaceInvaders.png",
+            "Imagenes/Enemigo1.png",
+            "Imagenes/Enemigo2.png",
+            "Imagenes/Enemigo3.png",
+            "Imagenes/Enemigo4.png"
         ];
 
         for (let fila = 0; fila < filas; fila++) {
             for (let col = 0; col < columnas; col++) {
-                const x = this.margen + col * this.spacingX;
-                const y = this.margen + fila * this.spacingY;
+                const x = this.margen + col * this.espacioX;
+                const y = this.margen + fila * this.espacioY;
                 const imgIndex = Math.min(fila, imgPaths.length - 1);
                 const enemigo = new component(50, 50, imgPaths[imgIndex], x, y);
                 this.enemigos.push(enemigo);
@@ -187,11 +193,11 @@ class Enemigos {
     actualizar() {
         const currentTime = new Date().getTime();
         let cambioDireccion = false;
-    
+
         // Solo mover si pasó el tiempo suficiente
         if (currentTime - this.lastMoveTime >= this.moveInterval) {
             this.lastMoveTime = currentTime;
-    
+
             // Verificar si algún enemigo toca bordes
             for (const enemigo of this.enemigos) {
                 if ((enemigo.x + enemigo.width >= myGameArea.canvas.width - this.margen && this.direccion > 0) || 
@@ -200,7 +206,7 @@ class Enemigos {
                     break;
                 }
             }
-    
+
             // Cambiar dirección si hace falta
             if (cambioDireccion) {
                 this.direccion *= -1;
@@ -208,17 +214,49 @@ class Enemigos {
             } else {
                 this.velocidadY = 0;
             }
-    
+
             // Mover enemigos
             for (const enemigo of this.enemigos) {
                 enemigo.x += this.velocidadX * this.direccion;
                 enemigo.y += this.velocidadY;
             }
         }
-    
+
         // Actualizar (dibujar) en cada frame, aunque no se muevan
         for (const enemigo of this.enemigos) {
             enemigo.update();
+        }
+
+        // Cada cierto tiempo disparan
+        if (currentTime - this.lastShotTime > 1000) { // cada 1 segundo
+            this.disparar();
+            this.lastShotTime = currentTime;
+        }
+    }
+
+    disparar() {
+        if (this.enemigos.length === 0);
+
+        // Com posem els enemics
+        const columnas = {};
+
+        for (let enemigo of this.enemigos) {
+            let col = Math.floor((enemigo.x - this.margen) / this.espacioX);
+            if (!columnas[col] || enemigo.y > columnas[col].y) {
+                columnas[col] = enemigo;
+            }
+        }
+
+        const keys = Object.keys(columnas); //Obte els indices de les columnes (1, 2 ,3 ,4, 5)
+
+        if (keys.length > 0) {
+            const colRandom = keys[Math.floor(Math.random() * keys.length)];
+            const enemigoElegido = columnas[colRandom];
+
+            // Es crea la bala
+            let bala = new bulletComponent(5, 10, "green", enemigoElegido.x + enemigoElegido.width / 2 - 2.5, enemigoElegido.y + enemigoElegido.height);
+            bala.speedY = 4; // Movimiento hacia abajo
+            enemyBullets.push(bala);  // Introduim la bala dins del ArrayList de bales dels enemics
         }
     }
 }
