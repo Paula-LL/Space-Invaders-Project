@@ -1,22 +1,22 @@
 let dom = $(document);
 
 let x = 0;
-var myGamePiece;
-var myGamePiece2;
+var Jugador1;
+var Jugador2;
 var bullets = [];         // ArrayList on guardar les bales dels jugadors
 var enemyBullets = [];    // ArrayList on guardar les bales dels enemics
 
-var lastShotTimePlayer1 = 0;  // Temps de l'ultim dispar del jugador 1
-var lastShotTimePlayer2 = 0;  // Temps de l'ultim dispar del jugador 2
-var shootCooldown = 500;      // Temps que posem entre dispar i dispar dels jugadors, perque no disparin seguit
+var ultimoDisparoDelJugador1 = 0;  // Temps de l'ultim dispar del jugador 1
+var ultimoDisparoDelJugador2 = 0;  // Temps de l'ultim dispar del jugador 2
+var coolDown = 500;      // Temps que posem entre dispar i dispar dels jugadors, perque no disparin seguit
 
 var vidaJugador1 = 5;
 var vidaJugador2 = 5;
 
 function startGame() {
     myGameArea.start();
-    myGamePiece = new component(100, 110, "Imagenes/Nave1.png", 695, 790);  // Jugador 1
-    myGamePiece2 = new component(100, 110, "Imagenes/Player2.png", 580, 800); // Jugador 2
+    Jugador1 = new component(100, 110, "Imagenes/Nave1.png", 695, 790);  // Jugador 1
+    Jugador2 = new component(100, 110, "Imagenes/Player2.png", 580, 800); // Jugador 2
     grupoEnemigos = new Enemigos(); //Es crea el grup dels enemics cridant a la classe Enemigos
 }
 
@@ -61,6 +61,18 @@ function component(width, height, imageSrc, x, y) {
         this.x += this.speedX;
         this.y += this.speedY;
     }
+    this.colisionaConJugador1 = function (Jugador1) {
+        return (this.x < Jugador1.x + Jugador1.width &&
+                this.x + this.width > Jugador1.x &&
+                this.y < Jugador1.y + Jugador1.height &&
+                this.y + this.height > Jugador1.y);
+    }
+    this.colisionaConJugador2 = function (Jugador2) {
+        return (this.x < Jugador2.x + Jugador2.width &&
+                this.x + this.width > Jugador2.x &&
+                this.y < Jugador2.y + Jugador2.height &&
+                this.y + this.height > Jugador2.y);
+    }
 }
 
 function bulletComponent(width, height, color, x, y) {
@@ -84,7 +96,7 @@ function bulletComponent(width, height, color, x, y) {
     }
 
     // Verifica si la bala a tocar algun enemic
-    this.colisionaCon = function (enemigo) {
+    this.colisionaConEnemigos = function (enemigo) {
         return (this.x < enemigo.x + enemigo.width &&
                 this.x + this.width > enemigo.x &&
                 this.y < enemigo.y + enemigo.height &&
@@ -96,33 +108,33 @@ function updateGameArea() {
     myGameArea.clear();
 
     // Actualitzem la velocitat dels jugadors
-    myGamePiece.speedX = 0;
-    myGamePiece2.speedX = 0;
+    Jugador1.speedX = 0;
+    Jugador2.speedX = 0;
 
     // Movimiento de los jugadores
     if (myGameArea.keys && myGameArea.keys[37]) { // Moviment cap a la esquerra del jugador 1
-        myGamePiece.speedX = -2;
+        Jugador1.speedX = -2;
     }
     if (myGameArea.keys && myGameArea.keys[39]) { // Moviment cap a la dreta del jugador 1
-        myGamePiece.speedX = 2;
+        Jugador1.speedX = 2;
     }
 
     if (myGameArea.keys && myGameArea.keys[65]) { //  Moviment cap a la esquerra del jugador 2
-        myGamePiece2.speedX = -2;
+        Jugador2.speedX = -2;
     }
     if (myGameArea.keys && myGameArea.keys[68]) { // Moviment cap a la dreta del jugador 2
-        myGamePiece2.speedX = 2;
+        Jugador2.speedX = 2;
     }
 
     // Actualitza la posicio dels jugadors i els dibuixa
-    myGamePiece.newPos();
-    myGamePiece.update();
+    Jugador1.newPos();
+    Jugador1.update();
 
-    myGamePiece2.newPos();
-    myGamePiece2.update();
+    Jugador2.newPos();
+    Jugador2.update();
 
     // Crida a la funcio disparar
-    shoot();
+    disparar();
 
     // Actualiza las balas dels jugadors
     for (let i = 0; i < bullets.length; i++) {
@@ -142,7 +154,7 @@ function updateGameArea() {
     // Es verifica si les bales i els enemics han sigut colisionats
     for (let i = 0; i < bullets.length; i++) {
         for (let j = 0; j < grupoEnemigos.enemigos.length; j++) {
-            if (bullets[i].colisionaCon(grupoEnemigos.enemigos[j])) {
+            if (bullets[i].colisionaConEnemigos(grupoEnemigos.enemigos[j])) {
                 // Elimina la bala i el enemic que han colisionat
                 bullets.splice(i, 1); // la funcio splice elimina
                 grupoEnemigos.enemigos.splice(j, 1);
@@ -151,28 +163,46 @@ function updateGameArea() {
             }
         }
     }
+
+
+    //Es verifica si la bala dels enemics i el jugador s'han colisionat
+    for(let i = 0; i < enemyBullets.length; i++){
+        if(enemyBullets[i].colisionaConJugador1(Jugador1)){
+            enemyBullets.splice(i, 1);
+            vidaJugador1 -= 1;
+            i--;
+            break;
+        }
+        if(enemyBullets[i].colisionaConJugador2(Jugador2)){
+            enemyBullets.splice(i, 1);
+            vidaJugador2 -= 1;
+            i--;
+            break;
+        }
+    }
+
+    
 }
 
-
 // Funcio de disparar dels jugadors
-function shoot() {
-    let currentTime = new Date().getTime(); // Agafem el temps actual
+function disparar() {
+    let tiempoActual = new Date().getTime(); // Agafem el temps actual
 
     if (myGameArea.keys && myGameArea.keys[96]) {  // El jugador disparara amb el 0 del pad numeric
-        if (currentTime - lastShotTimePlayer1 >= shootCooldown) {
-            let bullet1 = new bulletComponent(5, 10, "red", myGamePiece.x + 2 + myGamePiece.width / 2 - 5, myGamePiece.y + 20);
+        if (tiempoActual - ultimoDisparoDelJugador1 >= coolDown) {
+            let bullet1 = new bulletComponent(5, 10, "red", Jugador1.x + 2 + Jugador1.width / 2 - 5, Jugador1.y + 20);
             bullet1.speedY = -5;
             bullets.push(bullet1); // Afegeix la bala dins del ArrayList creat
-            lastShotTimePlayer1 = currentTime; //Aixo es per guardar quan va ser la ultima vegada que el jugador va disparar
+            ultimoDisparoDelJugador1 = tiempoActual; //Aixo es per guardar quan va ser la ultima vegada que el jugador va disparar
         }
     }
 
     if (myGameArea.keys && myGameArea.keys[32]) {  //El jugador disparara amb la tecla espai
-        if (currentTime - lastShotTimePlayer2 >= shootCooldown) {
-            let bullet2 = new bulletComponent(5, 10, "blue", myGamePiece2.x + 2 + myGamePiece2.width / 2 - 5, myGamePiece2.y + 10);
+        if (tiempoActual - ultimoDisparoDelJugador2 >= coolDown) {
+            let bullet2 = new bulletComponent(5, 10, "blue", Jugador2.x + 2 + Jugador2.width / 2 - 5, Jugador2.y + 10);
             bullet2.speedY = -5; 
             bullets.push(bullet2);
-            lastShotTimePlayer2 = currentTime; 
+            ultimoDisparoDelJugador2 = tiempoActual; 
         }
     }
 }
@@ -188,7 +218,7 @@ class Enemigos {
         this.margen = 50; // El marge que donem al canvas perque quan aquest sigui tocat pels aliens, aquests baixin
         this.espacioX = 70; // L'espai que hi ha entre enemic i enemic horitzontalment
         this.espacioY = 60; // Espai que hi ha entre enmic i enemic verticalment
-        this.lastShotTime = 0; // Quan va ser la ultima vegada q va disparar un enemic
+        this.ultimoDisparoEnemigos = 0; // Quan va ser la ultima vegada q va disparar un enemic
         this.inicializarEnemigos(); //Inicialitzem els enemics perque es mostrin
     }
 
@@ -216,12 +246,12 @@ class Enemigos {
     }
 
     actualizar() {
-        const currentTime = new Date().getTime();
+        const tiempoActual = new Date().getTime();
         let cambioDireccion = false;
 
         // Solo mover si pasó el tiempo suficiente
-        if (currentTime - this.lastMoveTime >= this.moveInterval) {
-            this.lastMoveTime = currentTime;
+        if (tiempoActual - this.lastMoveTime >= this.moveInterval) {
+            this.lastMoveTime = tiempoActual;
 
             // Es verifica si els enemics han tocat el marge del canva
             for (const enemigo of this.enemigos) {
@@ -253,9 +283,9 @@ class Enemigos {
         }
 
         // Cada cert temps dispararan
-        if (currentTime - this.lastShotTime > 1000) { // cada 1 segundo
+        if (tiempoActual - this.ultimoDisparoEnemigos > 1000) { // cada 1 segundo
             this.disparar();
-            this.lastShotTime = currentTime;
+            this.ultimoDisparoEnemigos = tiempoActual;
         }
 
         
