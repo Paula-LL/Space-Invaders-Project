@@ -26,6 +26,8 @@ var myGameArea = {
         this.canvas.width = 1300;
         this.canvas.height = 900;
         this.context = this.canvas.getContext("2d");
+        context.font = "50px Arial";
+        context.fillText("Hello World",10,80);
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         this.interval = setInterval(updateGameArea, 20);
         window.addEventListener('keydown', function (e) {
@@ -39,6 +41,7 @@ var myGameArea = {
     clear: function () {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
+
 }
 
 function component(width, height, imageSrc, x, y) {
