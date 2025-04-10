@@ -76,11 +76,11 @@ function bulletComponent(width, height, color, x, y) {
     this.update = function () {
         ctx = myGameArea.context;
         ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.width, this.height); // Dibuja las balas como rectángulos
+        ctx.fillRect(this.x, this.y, this.width, this.height); // Dibuixa les bales
     }
 
     this.newPos = function () {
-        this.y += this.speedY;  // Movimiento hacia arriba o hacia abajo
+        this.y += this.speedY;  // Moviment cap adalt o cap abaix
     }
 
     // Verifica si la bala a tocar algun enemic
