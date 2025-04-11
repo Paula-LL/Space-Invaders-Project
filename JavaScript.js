@@ -357,14 +357,14 @@ class Enemigos {
 
             // Es crea la bala
             let bala = new bulletComponent(5, 10, "green", enemigoElegido.x + enemigoElegido.width / 2 - 2.5, enemigoElegido.y + enemigoElegido.height);
-            bala.speedY = 4; // Movimiento hacia abajo
+            bala.speedY = 4; // Movimient cap abaix
             enemyBullets.push(bala);  // Introduim la bala dins del ArrayList de bales dels enemics
         }
     }
 }
 
 function detenerJuego() {
-    clearInterval(myGameArea.interval); // Detiene el juego
+    clearInterval(myGameArea.interval); // Para el joc
 }
 
 function mostrarPantallaFinal() {
