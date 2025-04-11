@@ -166,7 +166,23 @@ function updateGameArea() {
         for (let j = 0; j < grupoEnemigos.enemigos.length; j++) {
             if (bullets[i].colisionaConEnemigos(grupoEnemigos.enemigos[j])) {
                 // Es sumen les morts
-                
+                if (bullets[i].owner === 1) {
+                    muertesJugador1++;
+                    document.getElementById("muertesJ1").textContent = muertesJugador1;
+                    if(muertesJugador1 > 28){
+                        alert("El jugador 1 ha echo mas de la mitad del total de aliens, ha ganado!");
+                        detenerJuego();  // Para el joc
+                        mostrarPantallaFinal(); // Mostra la pantalla de reiniciar el joc
+                    }
+                } else if (bullets[i].owner === 2) {
+                    muertesJugador2++;
+                    document.getElementById("muertesJ2").textContent = muertesJugador2;
+                    if(muertesJugador2 > 28){
+                        alert("El jugador 2 ha echo mas de la mitad del total de aliens, ha ganado!");
+                        detenerJuego();
+                        mostrarPantallaFinal();
+                    }
+                }
     
                 bullets.splice(i, 1);
                 grupoEnemigos.enemigos.splice(j, 1);
@@ -180,7 +196,31 @@ function updateGameArea() {
 
     //Es verifica si la bala dels enemics i el jugador s'han colisionat
     for(let i = 0; i < enemyBullets.length; i++){
-    
+        if(enemyBullets[i].colisionaConJugador(Jugador1)){
+            enemyBullets.splice(i, 1);
+            vidaJugador1 -= 1;
+            document.getElementById("vidaJ1").textContent = vidaJugador1;
+        
+            if(vidaJugador1 == 0){
+                alert("El jugador 1 ha perdido todas las vidas, ha ganado el jugador 2!");
+                detenerJuego(); 
+                mostrarPantallaFinal();  
+            }
+            i--;
+            break;
+        }
+        if(enemyBullets[i].colisionaConJugador(Jugador2)){
+            enemyBullets.splice(i, 1);
+            vidaJugador2 -= 1;
+            document.getElementById("vidaJ2").textContent = vidaJugador2;
+            if(vidaJugador2 == 0){
+                alert("El jugador 2 ha perdido todas las vidas, ha ganado el jugador 1!");
+                detenerJuego(); 
+                mostrarPantallaFinal(); 
+            }
+            i--;
+            break;
+        }
 }
 
 
@@ -323,6 +363,29 @@ class Enemigos {
     }
 }
 
+function detenerJuego() {
+    clearInterval(myGameArea.interval); // Detiene el juego
+}
 
+function mostrarPantallaFinal() {
+    document.getElementById("pantallaFinal").style.display = "block"; // Muestra la pantalla final
+}
+
+function reiniciarJuego() {
+    // Reiniciem totes les variables
+    vidaJugador1 = 5;
+    vidaJugador2 = 5;
+    muertesJugador1 = 0;
+    muertesJugador2 = 0;
+    bullets = [];
+    enemyBullets = [];
+    // Truca a la funcio perque torni a començar el joc
+    startGame();
+    document.getElementById("pantallaFinal").style.display = "none";
+}
+
+function salir() {
+    window.location.reload(); // Recarregar la pagina
+}
 
 
