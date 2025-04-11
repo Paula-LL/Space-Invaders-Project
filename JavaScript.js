@@ -294,7 +294,7 @@ class Enemigos {
         const tiempoActual = new Date().getTime();
         let cambioDireccion = false;
 
-        // Solo mover si pasó el tiempo suficiente
+        // Nomes moure si ha pasat el temps suficient
         if (tiempoActual - this.lastMoveTime >= this.moveInterval) {
             this.lastMoveTime = tiempoActual;
 
