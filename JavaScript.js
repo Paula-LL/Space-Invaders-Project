@@ -13,10 +13,13 @@ var coolDown = 500;      // Temps que posem entre dispar i dispar dels jugadors,
 var vidaJugador1 = 5;
 var vidaJugador2 = 5;
 
+var muertesJugador1 = 0;
+var muertesJugador2 = 0;
+
 function startGame() {
     myGameArea.start();
-    Jugador1 = new component(100, 110, "Imagenes/Nave1.png", 695, 790);  // Jugador 1
-    Jugador2 = new component(100, 110, "Imagenes/Player2.png", 580, 800); // Jugador 2
+    Jugador1 = new component(120, 120, "Imagenes/Nave1.png", 500, 770);  // Jugador 1
+    Jugador2 = new component(100, 110, "Imagenes/Player2.png", 695, 790); // Jugador 2
     grupoEnemigos = new Enemigos(); //Es crea el grup dels enemics cridant a la classe Enemigos
 }
 
@@ -26,7 +29,9 @@ var myGameArea = {
         this.canvas.width = 1300;
         this.canvas.height = 900;
         this.context = this.canvas.getContext("2d");
-        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        document.getElementById("juego").appendChild(this.canvas);
+
+
         this.interval = setInterval(updateGameArea, 20);
         window.addEventListener('keydown', function (e) {
             myGameArea.keys = (myGameArea.keys || []);
@@ -37,6 +42,7 @@ var myGameArea = {
         });
     },
     clear: function () {
+        //Fondo transparent
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 }
@@ -60,22 +66,17 @@ function component(width, height, imageSrc, x, y) {
     this.newPos = function () {
         this.x += this.speedX;
         this.y += this.speedY;
-    }
-    this.colisionaConJugador1 = function (Jugador1) {
-        return (this.x < Jugador1.x + Jugador1.width &&
-                this.x + this.width > Jugador1.x &&
-                this.y < Jugador1.y + Jugador1.height &&
-                this.y + this.height > Jugador1.y);
-    }
-    this.colisionaConJugador2 = function (Jugador2) {
-        return (this.x < Jugador2.x + Jugador2.width &&
-                this.x + this.width > Jugador2.x &&
-                this.y < Jugador2.y + Jugador2.height &&
-                this.y + this.height > Jugador2.y);
+    
+        // Limit esquerra del canvas
+        if (this.x < 0) this.x = 0;
+    
+        // Limit dret del canvas
+        if (this.x + this.width > this.gamearea.canvas.width) {
+            this.x = this.gamearea.canvas.width - this.width;
+        }
     }
 }
-
-function bulletComponent(width, height, color, x, y) {
+function bulletComponent(width, height, color, x, y, owner) {
     this.gamearea = myGameArea;
     this.width = width;
     this.height = height;
@@ -84,6 +85,7 @@ function bulletComponent(width, height, color, x, y) {
     this.y = y;
     this.speedX = 0;
     this.speedY = 0;
+    this.owner = owner;
 
     this.update = function () {
         ctx = myGameArea.context;
@@ -102,6 +104,14 @@ function bulletComponent(width, height, color, x, y) {
                 this.y < enemigo.y + enemigo.height &&
                 this.y + this.height > enemigo.y);
     }
+
+    this.colisionaConJugador = function (jugador) {
+        return (this.x < jugador.x + jugador.width &&
+                this.x + this.width > jugador.x &&
+                this.y < jugador.y + jugador.height &&
+                this.y + this.height > jugador.y);
+    }
+    
 }
 //Aquesta funcio actualitza l'area de joc:
 function updateGameArea() {
@@ -155,31 +165,26 @@ function updateGameArea() {
     for (let i = 0; i < bullets.length; i++) {
         for (let j = 0; j < grupoEnemigos.enemigos.length; j++) {
             if (bullets[i].colisionaConEnemigos(grupoEnemigos.enemigos[j])) {
-                // Elimina la bala i el enemic que han colisionat
-                bullets.splice(i, 1); // la funcio splice elimina
+                // Es sumen les morts
+                
+    
+                bullets.splice(i, 1);
                 grupoEnemigos.enemigos.splice(j, 1);
-                i--; // Decrementa el índice de las balas para no saltarse ninguna
-                break; // Surtir del bucle perque nomes una bala pot eliminar a un enemic
+                i--;
+                break;
             }
         }
     }
+    
 
 
     //Es verifica si la bala dels enemics i el jugador s'han colisionat
     for(let i = 0; i < enemyBullets.length; i++){
-        if(enemyBullets[i].colisionaConJugador1(Jugador1)){
-            enemyBullets.splice(i, 1);
-            vidaJugador1 -= 1;
-            i--;
-            break;
-        }
-        if(enemyBullets[i].colisionaConJugador2(Jugador2)){
-            enemyBullets.splice(i, 1);
-            vidaJugador2 -= 1;
-            i--;
-            break;
-        }
-    }
+    
+}
+
+
+
 
     
 }
@@ -190,7 +195,7 @@ function disparar() {
 
     if (myGameArea.keys && myGameArea.keys[96]) {  // El jugador disparara amb el 0 del pad numeric
         if (tiempoActual - ultimoDisparoDelJugador1 >= coolDown) {
-            let bullet1 = new bulletComponent(5, 10, "red", Jugador1.x + 2 + Jugador1.width / 2 - 5, Jugador1.y + 20);
+            let bullet1 = new bulletComponent(5, 10, "red", Jugador1.x + 2 + Jugador1.width / 2 - 5, Jugador1.y + 20, 1); 
             bullet1.speedY = -5;
             bullets.push(bullet1); // Afegeix la bala dins del ArrayList creat
             ultimoDisparoDelJugador1 = tiempoActual; //Aixo es per guardar quan va ser la ultima vegada que el jugador va disparar
@@ -199,7 +204,7 @@ function disparar() {
 
     if (myGameArea.keys && myGameArea.keys[32]) {  //El jugador disparara amb la tecla espai
         if (tiempoActual - ultimoDisparoDelJugador2 >= coolDown) {
-            let bullet2 = new bulletComponent(5, 10, "blue", Jugador2.x + 2 + Jugador2.width / 2 - 5, Jugador2.y + 10);
+            let bullet2 = new bulletComponent(5, 10, "blue", Jugador2.x + 2 + Jugador2.width / 2 - 5, Jugador2.y + 10, 2);
             bullet2.speedY = -5; 
             bullets.push(bullet2);
             ultimoDisparoDelJugador2 = tiempoActual; 
@@ -317,3 +322,7 @@ class Enemigos {
         }
     }
 }
+
+
+
+

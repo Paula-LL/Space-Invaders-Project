@@ -13,6 +13,28 @@
     
 </head>
 <body onload="startGame()">
+
+    <div class="container-flex" style="display: flex;">
+        <div class="sidebar" style="width: 250px; padding: 20px;">
+            <h2 class="TituloJugadores" >Jugadores:</h2>
+            <p class="LetraJugadores">Vidas ❤️:</p>
+            <p class="LetraJugadores" >🦊Martelo_sinpan: <span id="vidaJ1">5</span></p>
+            <p class="LetraJugadores">🐞Linda_conpan: <span id="vidaJ2">5</span></p>
+            <p class="LetraJugadores">Muertes ☠️:</p>
+            <p class="LetraJugadores">🦊Martelo_sinpan: <span id="muertesJ1">0</span></p>
+            <p class="LetraJugadores">🐞Linda_conpan: <span id="muertesJ2">0</span></p>
+        </div>
+        <div class="game-container" id="juego" style="flex-grow: 1;">
+        </div>
+    </div>
+
+    <div id="pantallaFinal" style="display:none; text-align: center;">
+        <h2>¡Juego terminado!</h2>
+        <p>¿Quieres volver a jugar?</p>
+        <button class="Botton" onclick="reiniciarJuego()">Sí, volver a jugar</button>
+        <button class="Botton " onclick="salir()">No, salir</button>
+    </div>
+
  
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
